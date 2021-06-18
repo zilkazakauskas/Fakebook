@@ -54,14 +54,21 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'avatar' => ['required', 'string', 'max:2048'],
+            'avatar' => ['required', 'image', 'mimes:jpg,png,jpeg,gif,svg', 'max:2048'],
         ]);
+
+        $destination_path = 'public/images/users';
+        $image = $request->file('avatar');
+        $image_name = $image->getClientOriginalName();
+        $path = $request->file('avatar')->storeAs($destination_path, $image_name);
+
+        $imageToSave['avatar'] = $image_name;
 
         $user = User::create([
             'name' => $request['name'],
             'email' => $request['email'],
             'password' => Hash::make($request['password']),
-            'avatar' => $request['avatar'],
+            'avatar' => $image_name,
         ]);
 
         Auth::login($user);

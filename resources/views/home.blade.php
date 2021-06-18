@@ -5,7 +5,44 @@
         <div>
             <a href="/addPostForm"><button class="btn btn-primary">Add post</button></a>
         </div>
-        {{-- {{ dd($user) }} --}}
+        {{-- {{ dd($posts) }} --}}
+        <div class="row d-flex justify-content-center mb-5">
+            <form class="d-inline-block" action="{{ route('search') }}" method="get">
+                {{-- @csrf --}}
+                <div class="input-group mb-2">
+                    <input id="keyword" type="text" class="form-control @error('keyword') is-invalid @enderror"
+                        name="keyword" value="{{ old('keyword') }}" required autocomplete="keyword"
+                        placeholder="Search keyword here...">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary btn-search" type="submit">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-search" viewBox="0 0 16 16">
+                                <path
+                                    d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                @if ($errors->has('keyword'))
+                    <span class="invalid-feedback mb-3" style="display: block;" role="alert">
+                        <strong>{{ $errors->first('keyword') }}</strong>
+                    </span>
+                @endif
+                <div class="input-group mb-2">
+                    <select name="searchBy" class="custom-select @error('searchBy') is-invalid @enderror" id="searchBy">
+                        <option selected value="">Choose search criteria...</option>
+                        <option value="1">Search by author name</option>
+                        <option value="2">Search by content fragment</option>
+                    </select>
+                </div>
+                @if ($errors->has('searchBy'))
+                    <span class="invalid-feedback" style="display: block;" role="alert">
+                        <strong>{{ $errors->first('searchBy') }}</strong>
+                    </span>
+                @endif
+            </form>
+        </div>
+
         @isset($posts)
             @foreach ($posts as $post)
                 <div class="row mt-2 mb-5 d-flex align-items-center justify-content-center">
@@ -13,8 +50,8 @@
                         <div class="card">
                             <div class="d-flex justify-content-between p-2 px-3">
                                 <div class="d-flex flex-row align-items-center"> <img
-                                        src="https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png"
-                                        alt="avatar" width="50" class="rounded-circle">
+                                        src="{{ asset('/storage/images/users/' . $post['user']->avatar) }}" alt="avatar"
+                                        width="50" class="rounded-circle">
                                     <div class="d-flex flex-column ml-2"> <span
                                             class="font-weight-bold">{{ $post->user->name }}</span></div>
                                 </div>
@@ -23,6 +60,14 @@
                                 </div>
                             </div>
                             <div class="p-2">
+
+                                @if ($post->image !== null)
+                                    <p>
+                                        <img src="{{ asset('/storage/images/posts/' . $post->image) }}" alt="img"
+                                            style="max-width: 75%">
+                                    </p>
+                                @endif
+
                                 <p class="text-justify">{{ $post->content }}</p>
                                 <hr>
                                 <div class="d-flex flex-row-reverse icons d-flex align-items-center">
@@ -38,7 +83,8 @@
                                     </a>
                                     {{ $post->likesCount() }}
                                     <form class="d-inline-block"
-                                        action={{ route('like', ['user' => Auth::id(), 'post' => $post->id]) }} method="post">
+                                        action={{ route('like', ['user' => Auth::id(), 'post' => $post->id]) }}
+                                        method="post">
                                         @csrf
                                         <button class="btn btn-link" type="submit"> <svg xmlns="http://www.w3.org/2000/svg"
                                                 width="16" height="16" fill="currentColor" class="bi bi-hand-thumbs-up"

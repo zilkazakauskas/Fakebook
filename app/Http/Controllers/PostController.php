@@ -6,6 +6,7 @@ use App\Models\Comment;
 use App\Models\Like;
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -46,13 +47,21 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'content' => 'required|string|min:1|max:1000'
+            'content' => 'required|string|min:1|max:1000',
+            'image' => 'image|mimes:jpg,png,jpeg,gif,svg|max:2048',
         ]);
 
-        Post::create([
-            'user_id' => Auth::id(),
-            'content' => $request['content'],
-        ]);
+        $save = new Post;
+        if ($request->hasfile('image')) {
+            $name = $request->file('image')->getClientOriginalName();
+            $path = $request->file('image')->storeAs('public/images/posts', $name);
+            $save->image = $name;
+            // $save->image = $path;
+        }
+        $save->user_id = $request->user()->id;
+        $save->content = $request->content;
+        $save->save();
+
         return redirect('/');
     }
 
@@ -109,5 +118,31 @@ class PostController extends Controller
         Comment::where('post_id', $id)->delete();
 
         return redirect('/');
+    }
+
+    public function search(Request $request)
+    {
+        $request->validate([
+            'keyword' => 'bail|required|max:255',
+            'searchBy' => 'required',
+        ]);
+
+        // name
+        if ($request->searchBy === '1') {
+            $users = User::where('name', 'LIKE', "%{$request->keyword}%")->get();
+            $original = new Collection();
+            $posts = new Collection();
+            foreach ($users as $user) {
+                $posts = $original->merge(Post::where('user_id', $user->id)->get());
+                $original = $posts;
+            }
+            // dd($users, $posts);
+            return view('home', ['posts' => $posts]);
+        }
+
+        // fragment
+        if ($request->searchBy === '2') {
+            return view('home', ['posts' => Post::where('content', 'LIKE', "%{$request->keyword}%")->get()]);
+        }
     }
 }

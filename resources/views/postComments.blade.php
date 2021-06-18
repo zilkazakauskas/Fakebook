@@ -11,8 +11,8 @@
                         <div class="card">
                             <div class="d-flex justify-content-between p-2 px-3">
                                 <div class="d-flex flex-row align-items-center"> <img
-                                        src="https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png"
-                                        alt="avatar" width="50" class="rounded-circle">
+                                        src="{{ asset('/storage/images/users/' . $post['user']->avatar) }}" alt="avatar"
+                                        width="50" class="rounded-circle">
                                     <div class="d-flex flex-column ml-2"> <span
                                             class="font-weight-bold">{{ $comment->user->name }}</span>
                                     </div>

@@ -20,6 +20,18 @@
                         </div>
                     </div>
 
+                    <div class="form-group row">
+                        <div class="col">
+                            <input type="file" class="form-control-file" name="image" id="image">
+
+                            @error('image')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
+
                     <div class="form-group-reverse row mb-0">
                         <div class="col-md-6">
                             <button type="submit" class="btn btn-primary">

@@ -47,6 +47,8 @@ Route::post('commentStore/{post}', [CommentController::class, 'store'])->name('c
 Route::post('postUpdate/{post}', [PostController::class, 'update'])->name('postUpdate');
 Route::post('deletePost/{id}', [PostController::class, 'destroy'])->name('deletePost');
 
+Route::get('/posts/search', [PostController::class, 'search'])->name('search');
+
 // Route::get('/my-posts', [PostController::class, 'showUserPosts'])->name('my-posts');
 // Route::get('/{post}/comments', [CommentController::class, 'index'])->name('comments');
 // Route::post('/{post}/comment/store', [CommentController::class, 'store'])->name('comment.store');
